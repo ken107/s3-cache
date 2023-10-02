@@ -1,0 +1,28 @@
+{
+  "name": "s3-cache",
+  "version": "1.0.0",
+  "description": "An S3 cache that supports expiration based on last access time",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "test": "node dist/index.test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lsdsoftware/s3-cache.git"
+  },
+  "author": "Hai Phan <hai.phan@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/lsdsoftware/s3-cache/issues"
+  },
+  "homepage": "https://github.com/lsdsoftware/s3-cache#readme",
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.421.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.8.0",
+    "typescript": "^5.2.2"
+  }
+}
