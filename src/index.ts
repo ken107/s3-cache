@@ -59,7 +59,6 @@ export class S3Cache {
       Body: value.data,
       Metadata: value.metadata
     })
-    await this.opts.cleanupOpts?.accessLog.setLastAccessed(objKey)
     this.throttledCleanup?.()
   }
 
@@ -78,7 +77,8 @@ export class S3Cache {
       const now = Date.now()
       const objKeysToDelete: string[] = []
       for await (const obj of this.listObjects()) {
-        const lastAccessed = await accessLog.getLastAccessed(obj.Key!)
+        let lastAccessed = await accessLog.getLastAccessed(obj.Key!)
+        if (obj.LastModified) lastAccessed = Math.max(lastAccessed, obj.LastModified.getTime())
         if (lastAccessed + ttl < now) objKeysToDelete.push(obj.Key!)
       }
       await this.deleteObjects(objKeysToDelete)

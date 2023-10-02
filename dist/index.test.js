@@ -38,26 +38,41 @@ async function runTest() {
         cache.invalidate("1"),
         cache.invalidate("2"),
         cache.invalidate("3"),
+        cache.invalidate("4"),
+        cache.invalidate("5"),
     ]);
+    //---------------------
     await sleep(3000);
     assert(await cache.get("1") === undefined);
+    //1: set now and get now, will expire
     await cache.set("1", { data: Buffer.from("Uno"), metadata: { k: "one" } });
     //first cleanup triggered
-    await cache.set("2", { data: Buffer.from("Dos") });
     const one = await cache.get("1");
     assert(one?.data.toString() == "Uno" && one.metadata?.k == "one");
+    //2: set now but get later, won't expire
+    await cache.set("2", { data: Buffer.from("Dos") });
+    //3: set now but never get, will expire
+    await cache.set("3", { data: Buffer.from("Tres") });
+    //---------------------
     await sleep(1300);
     await cache.get("2");
+    //4: set late and never get, won't expire
+    await cache.set("4", { data: Buffer.from("Quatro") });
     await sleep(300);
-    await cache.set("3", { data: Buffer.from("Tres") });
-    //second cleanup triggered 1600ms later, 1 has expired, 2 still valid
+    await cache.set("5", { data: Buffer.from("Cinco") });
+    //second cleanup triggered (1600ms after first)
+    //----------------------
     await sleep(3000);
-    assert(await cache.get("1") === undefined);
-    assert((await cache.get("2"))?.data.toString() === "Dos");
-    assert((await cache.get("3"))?.data.toString() === "Tres");
     assert(!accessLog.map.has(prefix + "1"));
     assert(accessLog.map.has(prefix + "2"));
-    assert(accessLog.map.has(prefix + "3"));
+    assert(!accessLog.map.has(prefix + "3"));
+    assert(!accessLog.map.has(prefix + "4"));
+    assert(!accessLog.map.has(prefix + "5"));
+    assert(await cache.get("1") === undefined);
+    assert((await cache.get("2"))?.data.toString() === "Dos");
+    assert(await cache.get("3") === undefined);
+    assert((await cache.get("4"))?.data.toString() === "Quatro");
+    assert((await cache.get("5"))?.data.toString() === "Cinco");
 }
 function sleep(millis) {
     return new Promise(f => setTimeout(f, millis));
