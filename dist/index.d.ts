@@ -18,6 +18,10 @@ interface S3CacheOptions {
         };
         ttl: number;
         cleanupInterval: number;
+        logger: {
+            debug: Console["debug"];
+            error: Console["error"];
+        };
     };
 }
 export declare class S3Cache {

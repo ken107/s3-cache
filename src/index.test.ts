@@ -31,6 +31,7 @@ const cache = new S3Cache({
     accessLog,
     ttl: 1000,
     cleanupInterval: 1500,
+    logger: console
   }
 })
 

@@ -29,6 +29,7 @@ const cache = new index_1.S3Cache({
         accessLog,
         ttl: 1000,
         cleanupInterval: 1500,
+        logger: console
     }
 });
 runTest()

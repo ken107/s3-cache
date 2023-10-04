@@ -48,10 +48,10 @@ class S3Cache {
         });
     }
     async cleanup() {
+        const { accessLog, ttl, logger } = this.opts.cleanupOpts;
+        const now = Date.now();
+        logger.debug("Cleaning up", this.opts.bucket, this.opts.prefix, ttl);
         try {
-            //console.debug("Cleaning up", this.opts.bucket, this.opts.prefix)
-            const { accessLog, ttl } = this.opts.cleanupOpts;
-            const now = Date.now();
             let ContinuationToken;
             do {
                 const { Contents, NextContinuationToken } = await this.s3.listObjectsV2({
@@ -64,18 +64,19 @@ class S3Cache {
                     const expiredObjs = Contents
                         .filter((obj, index) => Math.max(lastAccessed[index], obj.LastModified.getTime()) + ttl < now);
                     if (expiredObjs.length) {
+                        logger.debug("Found", expiredObjs.length, "expired objects in", Contents.length);
                         await accessLog.delete(expiredObjs.map(obj => obj.Key));
-                        await this.deleteObjects(expiredObjs);
+                        await this.deleteObjects(expiredObjs, logger);
                     }
                 }
                 ContinuationToken = NextContinuationToken;
             } while (ContinuationToken);
         }
         catch (err) {
-            console.error("Cleanup failed", err);
+            logger.error("Cleanup failed", err);
         }
     }
-    async deleteObjects(objs) {
+    async deleteObjects(objs, logger) {
         const { Errors } = await this.s3.deleteObjects({
             Bucket: this.opts.bucket,
             Delete: {
@@ -84,7 +85,7 @@ class S3Cache {
             }
         });
         if (Errors?.length)
-            console.error("Failed to delete", Errors.length, "objects, first error", Errors[0]);
+            logger.error("Failed to delete", Errors.length, "objects, first error", Errors[0]);
     }
 }
 exports.S3Cache = S3Cache;
