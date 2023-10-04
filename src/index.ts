@@ -68,6 +68,7 @@ export class S3Cache {
 
   async invalidate(cacheKey: string) {
     const objKey = (this.opts.prefix ?? "") + cacheKey
+    await this.opts.cleanupOpts?.accessLog.delete([objKey])
     await this.s3.deleteObject({
       Bucket: this.opts.bucket,
       Key: objKey
