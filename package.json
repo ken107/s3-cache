@@ -1,6 +1,6 @@
 {
   "name": "@lsdsoftware/s3-cache",
-  "version": "1.0.0",
+  "version": "1.0.5",
   "description": "An S3 cache that supports expiration based on last access time",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -24,6 +24,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.8.0",
+    "multilayer-async-cache-builder": "^2.0.5",
     "typescript": "^5.2.2"
   }
 }
