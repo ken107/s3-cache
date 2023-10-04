@@ -32,7 +32,7 @@ export declare class S3Cache {
     get(cacheKey: string): Promise<BinaryData | undefined>;
     set(cacheKey: string, value: BinaryData): Promise<void>;
     invalidate(cacheKey: string): Promise<void>;
-    private cleanup;
+    cleanup(): Promise<void>;
     private deleteObjects;
 }
 export {};

@@ -74,7 +74,7 @@ export class S3Cache {
     })
   }
 
-  private async cleanup() {
+  async cleanup() {
     const {accessLog, ttl, logger} = this.opts.cleanupOpts!
     const now = Date.now()
     logger.debug("Cleaning up", this.opts.bucket, this.opts.prefix, ttl)
