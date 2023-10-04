@@ -12,9 +12,9 @@ interface S3CacheOptions {
     prefix?: string;
     cleanupOpts?: {
         accessLog: {
-            getLastAccessed(objKey: string): number | Promise<number>;
-            setLastAccessed(objKey: string): void | Promise<void>;
-            delete(objKeys: string[]): void | Promise<void>;
+            getLastAccessed(objKeys: string[]): Promise<number[]>;
+            setLastAccessed(objKey: string): Promise<void>;
+            delete(objKeys: string[]): Promise<void>;
         };
         ttl: number;
         cleanupInterval: number;
@@ -29,7 +29,6 @@ export declare class S3Cache {
     set(cacheKey: string, value: BinaryData): Promise<void>;
     invalidate(cacheKey: string): Promise<void>;
     private cleanup;
-    private listObjects;
     private deleteObjects;
 }
 export {};

@@ -12,13 +12,13 @@ const prefix = process.env.CACHE_PREFIX
 
 const accessLog = {
   map: new Map<string, number>(),
-  getLastAccessed(objKey: string) {
-    return this.map.get(objKey) ?? 0
+  async getLastAccessed(objKeys: string[]) {
+    return objKeys.map(objKey => this.map.get(objKey) ?? 0)
   },
-  setLastAccessed(objKey: string) {
+  async setLastAccessed(objKey: string) {
     this.map.set(objKey, Date.now())
   },
-  delete(objKeys: string[]) {
+  async delete(objKeys: string[]) {
     for (const objKey of objKeys) this.map.delete(objKey)
   }
 }

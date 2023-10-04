@@ -10,13 +10,13 @@ const bucket = process.env.CACHE_BUCKET;
 const prefix = process.env.CACHE_PREFIX;
 const accessLog = {
     map: new Map(),
-    getLastAccessed(objKey) {
-        return this.map.get(objKey) ?? 0;
+    async getLastAccessed(objKeys) {
+        return objKeys.map(objKey => this.map.get(objKey) ?? 0);
     },
-    setLastAccessed(objKey) {
+    async setLastAccessed(objKey) {
         this.map.set(objKey, Date.now());
     },
-    delete(objKeys) {
+    async delete(objKeys) {
         for (const objKey of objKeys)
             this.map.delete(objKey);
     }
