@@ -1,20 +1,15 @@
 import { CacheX } from "multilayer-async-cache-builder";
-import { Base, BaseOptions, BinaryData } from "./common";
-
-interface S3CacheXOptions extends BaseOptions {
-  getDownloadUrl(objKey: string): string
-}
+import { Base, BaseInput } from "./common";
 
 interface S3CacheXOutput {
-  downloadUrl: string
+  objKey: string
+  contentType?: string
+  contentLength: number
   metadata?: Record<string, string>
 }
 
 
-export class S3CacheX extends Base implements CacheX<BinaryData, S3CacheXOutput> {
-  constructor(opts: S3CacheXOptions) {
-    super(opts)
-  }
+export class S3CacheX extends Base implements CacheX<BaseInput, S3CacheXOutput> {
 
   async get(cacheKey: string): Promise<S3CacheXOutput|undefined> {
     const objKey = (this.opts.prefix ?? "") + cacheKey
@@ -25,7 +20,9 @@ export class S3CacheX extends Base implements CacheX<BinaryData, S3CacheXOutput>
       })
       await this.opts.cleanupOpts?.accessLog.setLastAccessed(objKey)
       return {
-        downloadUrl: (this.opts as S3CacheXOptions).getDownloadUrl(objKey),
+        objKey,
+        contentType: res.ContentType,
+        contentLength: res.ContentLength!,
         metadata: res.Metadata
       }
     }
@@ -35,17 +32,21 @@ export class S3CacheX extends Base implements CacheX<BinaryData, S3CacheXOutput>
     }
   }
 
-  async set(cacheKey: string, value: BinaryData): Promise<S3CacheXOutput> {
+  async set(cacheKey: string, value: BaseInput): Promise<S3CacheXOutput> {
     const objKey = (this.opts.prefix ?? "") + cacheKey
     await this.s3.putObject({
       Bucket: this.opts.bucket,
       Key: objKey,
       Body: value.data,
+      ContentType: value.contentType,
+      CacheControl: value.cacheControl,
       Metadata: value.metadata
     })
     this.throttledCleanup?.()
     return {
-      downloadUrl: (this.opts as S3CacheXOptions).getDownloadUrl(objKey),
+      objKey,
+      contentType: value.contentType,
+      contentLength: value.data.length,
       metadata: value.metadata
     }
   }

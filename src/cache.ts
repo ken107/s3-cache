@@ -1,10 +1,10 @@
 import { Cache } from "multilayer-async-cache-builder";
-import { Base, BinaryData } from "./common";
+import { Base, BaseInput } from "./common";
 
 
-export class S3Cache extends Base implements Cache<BinaryData> {
+export class S3Cache extends Base implements Cache<BaseInput> {
 
-  async get(cacheKey: string): Promise<BinaryData|undefined> {
+  async get(cacheKey: string): Promise<BaseInput|undefined> {
     const objKey = (this.opts.prefix ?? "") + cacheKey
     try {
       const res = await this.s3.getObject({
@@ -15,6 +15,8 @@ export class S3Cache extends Base implements Cache<BinaryData> {
       const content = await res.Body!.transformToByteArray()
       return {
         data: Buffer.from(content),
+        contentType: res.ContentType,
+        cacheControl: res.CacheControl,
         metadata: res.Metadata
       }
     }
@@ -24,12 +26,14 @@ export class S3Cache extends Base implements Cache<BinaryData> {
     }
   }
 
-  async set(cacheKey: string, value: BinaryData) {
+  async set(cacheKey: string, value: BaseInput) {
     const objKey = (this.opts.prefix ?? "") + cacheKey
     await this.s3.putObject({
       Bucket: this.opts.bucket,
       Key: objKey,
       Body: value.data,
+      ContentType: value.contentType,
+      CacheControl: value.cacheControl,
       Metadata: value.metadata
     })
     this.throttledCleanup?.()

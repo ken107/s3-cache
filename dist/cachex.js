@@ -3,9 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.S3CacheX = void 0;
 const common_1 = require("./common");
 class S3CacheX extends common_1.Base {
-    constructor(opts) {
-        super(opts);
-    }
     async get(cacheKey) {
         const objKey = (this.opts.prefix ?? "") + cacheKey;
         try {
@@ -15,7 +12,9 @@ class S3CacheX extends common_1.Base {
             });
             await this.opts.cleanupOpts?.accessLog.setLastAccessed(objKey);
             return {
-                downloadUrl: this.opts.getDownloadUrl(objKey),
+                objKey,
+                contentType: res.ContentType,
+                contentLength: res.ContentLength,
                 metadata: res.Metadata
             };
         }
@@ -32,11 +31,15 @@ class S3CacheX extends common_1.Base {
             Bucket: this.opts.bucket,
             Key: objKey,
             Body: value.data,
+            ContentType: value.contentType,
+            CacheControl: value.cacheControl,
             Metadata: value.metadata
         });
         this.throttledCleanup?.();
         return {
-            downloadUrl: this.opts.getDownloadUrl(objKey),
+            objKey,
+            contentType: value.contentType,
+            contentLength: value.data.length,
             metadata: value.metadata
         };
     }

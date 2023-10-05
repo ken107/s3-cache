@@ -14,6 +14,8 @@ class S3Cache extends common_1.Base {
             const content = await res.Body.transformToByteArray();
             return {
                 data: Buffer.from(content),
+                contentType: res.ContentType,
+                cacheControl: res.CacheControl,
                 metadata: res.Metadata
             };
         }
@@ -30,6 +32,8 @@ class S3Cache extends common_1.Base {
             Bucket: this.opts.bucket,
             Key: objKey,
             Body: value.data,
+            ContentType: value.contentType,
+            CacheControl: value.cacheControl,
             Metadata: value.metadata
         });
         this.throttledCleanup?.();

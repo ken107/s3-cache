@@ -1,10 +1,10 @@
 /// <reference types="node" />
 import { S3, S3ClientConfig } from "@aws-sdk/client-s3";
-export interface BinaryData {
+export interface BaseInput {
     data: Buffer;
-    metadata?: {
-        [key: string]: string;
-    };
+    contentType?: string;
+    cacheControl?: string;
+    metadata?: Record<string, string>;
 }
 export declare function throttle(fn: () => void, interval: number): () => void;
 export interface BaseOptions {
