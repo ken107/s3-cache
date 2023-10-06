@@ -1,10 +1,10 @@
 import { Cache } from "multilayer-async-cache-builder";
-import { Base, BaseInput } from "./common";
+import { Base, S3CacheEntry } from "./common";
 
 
-export class S3Cache extends Base implements Cache<BaseInput> {
+export class S3Cache extends Base implements Cache<S3CacheEntry> {
 
-  async get(cacheKey: string): Promise<BaseInput|undefined> {
+  async get(cacheKey: string): Promise<S3CacheEntry|undefined> {
     const objKey = (this.opts.prefix ?? "") + cacheKey
     try {
       const res = await this.s3.getObject({
@@ -26,7 +26,7 @@ export class S3Cache extends Base implements Cache<BaseInput> {
     }
   }
 
-  async set(cacheKey: string, value: BaseInput) {
+  async set(cacheKey: string, value: S3CacheEntry) {
     const objKey = (this.opts.prefix ?? "") + cacheKey
     await this.s3.putObject({
       Bucket: this.opts.bucket,

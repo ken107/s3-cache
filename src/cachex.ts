@@ -1,5 +1,5 @@
 import { CacheX } from "multilayer-async-cache-builder";
-import { Base, BaseInput } from "./common";
+import { Base, S3CacheEntry } from "./common";
 
 interface S3CacheXOutput {
   objKey: string
@@ -9,7 +9,7 @@ interface S3CacheXOutput {
 }
 
 
-export class S3CacheX extends Base implements CacheX<BaseInput, S3CacheXOutput> {
+export class S3CacheX extends Base implements CacheX<S3CacheEntry, S3CacheXOutput> {
 
   async get(cacheKey: string): Promise<S3CacheXOutput|undefined> {
     const objKey = (this.opts.prefix ?? "") + cacheKey
@@ -32,7 +32,7 @@ export class S3CacheX extends Base implements CacheX<BaseInput, S3CacheXOutput> 
     }
   }
 
-  async set(cacheKey: string, value: BaseInput): Promise<S3CacheXOutput> {
+  async set(cacheKey: string, value: S3CacheEntry): Promise<S3CacheXOutput> {
     const objKey = (this.opts.prefix ?? "") + cacheKey
     await this.s3.putObject({
       Bucket: this.opts.bucket,

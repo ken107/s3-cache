@@ -1,6 +1,6 @@
 /// <reference types="node" />
 import { S3, S3ClientConfig } from "@aws-sdk/client-s3";
-export interface BaseInput {
+export interface S3CacheEntry {
     data: Buffer;
     contentType?: string;
     cacheControl?: string;
